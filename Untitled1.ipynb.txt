@@ -1,0 +1,812 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "f8Kg91qh4Tzd",
+        "outputId": "7d981d36-a506-4f66-e36f-42d440bd9c67"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Bienvenue dans COMPTALIA\n",
+            "Systeme comptable pret\n"
+          ]
+        }
+      ],
+      "source": [
+        "operations = []\n",
+        "\n",
+        "def ajouter_operation(date, libelle, compte_debit, compte_credit, montant):\n",
+        "    if montant <= 0:\n",
+        "        return \"Erreur: montant invalide\"\n",
+        "\n",
+        "    operations.append({\n",
+        "        \"Date\": date,\n",
+        "        \"Libelle\": libelle,\n",
+        "        \"Debit\": compte_debit,\n",
+        "        \"Credit\": compte_credit,\n",
+        "        \"Montant\": montant\n",
+        "    })\n",
+        "\n",
+        "    return \"Operation ajoutee avec succes\"\n",
+        "\n",
+        "def afficher_journal():\n",
+        "    for op in operations:\n",
+        "        print(op)\n",
+        "\n",
+        "def verifier_equilibre():\n",
+        "    total_debit = sum(op[\"Montant\"] for op in operations)\n",
+        "    total_credit = sum(op[\"Montant\"] for op in operations)\n",
+        "\n",
+        "    return total_debit == total_credit\n",
+        "\n",
+        "print(\"Bienvenue dans COMPTALIA\")\n",
+        "print(\"Systeme comptable pret\")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "MyT7ctljs7p1"
+      },
+      "source": []
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "b_fREpSI8GLw"
+      },
+      "outputs": [],
+      "source": []
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "CzxEb03K9XJy",
+        "outputId": "a39da09c-11c5-4a63-cb6b-985e522350e1"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "Operation ajoutee avec succes\n",
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "{'Date': '13.11.2026', 'Libelle': 'Achat de marsandises', 'Debit': '380', 'Credit': '401', 'Montant': 15000.0}\n",
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "Operation ajoutee avec succes\n",
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "{'Date': '13.11.2026', 'Libelle': 'Achat de marsandises', 'Debit': '380', 'Credit': '401', 'Montant': 15000.0}\n",
+            "{'Date': '13.11.2026 ', 'Libelle': 'Achat de masandises', 'Debit': '380', 'Credit': '401', 'Montant': 15000.0}\n",
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "Votre choix: 0\n",
+            "Au revoir!\n"
+          ]
+        }
+      ],
+      "source": [
+        "def menu():\n",
+        "    while True:\n",
+        "        print(\"\\n===== COMPTALIA =====\")\n",
+        "        print(\"1 - Ajouter une operation\")\n",
+        "        print(\"2 - Afficher le journal\")\n",
+        "        print(\"3 - Verifier l'equilibre\")\n",
+        "        print(\"0 - Quitter\")\n",
+        "\n",
+        "        choix = input(\"Votre choix: \")\n",
+        "\n",
+        "        if choix == \"1\":\n",
+        "            date = input(\"Date: \")\n",
+        "            libelle = input(\"Libelle: \")\n",
+        "            debit = input(\"Compte debit: \")\n",
+        "            credit = input(\"Compte credit: \")\n",
+        "\n",
+        "            try:\n",
+        "                montant = float(input(\"Montant: \"))\n",
+        "                resultat = ajouter_operation(\n",
+        "                    date, libelle, debit, credit, montant\n",
+        "                )\n",
+        "                print(resultat)\n",
+        "            except ValueError:\n",
+        "                print(\"Montant invalide\")\n",
+        "\n",
+        "        elif choix == \"2\":\n",
+        "            afficher_journal()\n",
+        "\n",
+        "        elif choix == \"3\":\n",
+        "            print(\"Total debit et credit:\")\n",
+        "            print(verifier_equilibre())\n",
+        "\n",
+        "        elif choix == \"0\":\n",
+        "            print(\"Au revoir!\")\n",
+        "            break\n",
+        "\n",
+        "        else:\n",
+        "            print(\"Choix invalide\")\n",
+        "\n",
+        "menu()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3uATmMDfbnKw",
+        "outputId": "3a24e130-8a57-448e-d343-3ba0e41dd265"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Les 4 fonctions COMPTALIA sont pretes !\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "if \"operations\" not in globals():\n",
+        "    operations = []\n",
+        "\n",
+        "# 1. Ajouter une opération comptable\n",
+        "def ajouter_operation():\n",
+        "    print(\"=== AJOUTER UNE OPERATION ===\")\n",
+        "    date = input(\"Date (AAAA-MM-JJ) : \")\n",
+        "    libelle = input(\"Libelle : \")\n",
+        "    debit = input(\"Compte debit : \")\n",
+        "    credit = input(\"Compte credit : \")\n",
+        "    montant = float(input(\"Montant : \"))\n",
+        "\n",
+        "    operations.append({\n",
+        "        \"date\": date,\n",
+        "        \"libelle\": libelle,\n",
+        "        \"debit\": debit,\n",
+        "        \"credit\": credit,\n",
+        "        \"montant\": montant\n",
+        "    })\n",
+        "\n",
+        "    print(\"Operation ajoutee avec succes !\")\n",
+        "\n",
+        "\n",
+        "# 2. Afficher le journal comptable\n",
+        "def afficher_journal():\n",
+        "    print(\"=== JOURNAL COMPTABLE ===\")\n",
+        "\n",
+        "    if not operations:\n",
+        "        print(\"Aucune operation.\")\n",
+        "        return\n",
+        "\n",
+        "    for op in operations:\n",
+        "        print(\"-----------------------\")\n",
+        "        print(\"Date :\", op[\"date\"])\n",
+        "        print(\"Libelle :\", op[\"libelle\"])\n",
+        "        print(\"Debit :\", op[\"debit\"])\n",
+        "        print(\"Credit :\", op[\"credit\"])\n",
+        "        print(\"Montant :\", op[\"montant\"])\n",
+        "\n",
+        "\n",
+        "# 3. Calculer les soldes et les totaux\n",
+        "def calculer_soldes():\n",
+        "    soldes = {}\n",
+        "\n",
+        "    for op in operations:\n",
+        "        debit = op[\"debit\"]\n",
+        "        credit = op[\"credit\"]\n",
+        "        montant = op[\"montant\"]\n",
+        "\n",
+        "        soldes[debit] = soldes.get(debit, 0) + montant\n",
+        "        soldes[credit] = soldes.get(credit, 0) - montant\n",
+        "\n",
+        "    print(\"=== SOLDES DES COMPTES ===\")\n",
+        "    for compte, solde in soldes.items():\n",
+        "        print(compte, \":\", solde)\n",
+        "\n",
+        "    print(\"Total des operations :\",\n",
+        "          sum(op[\"montant\"] for op in operations))\n",
+        "\n",
+        "\n",
+        "# 4. Detecter les erreurs comptables\n",
+        "def detecter_erreurs():\n",
+        "    print(\"=== CONTROLE DES ERREURS ===\")\n",
+        "    erreurs = 0\n",
+        "\n",
+        "    for op in operations:\n",
+        "        if op[\"montant\"] <= 0:\n",
+        "            print(\"Erreur : montant invalide\")\n",
+        "            erreurs += 1\n",
+        "\n",
+        "        if not op[\"debit\"] or not op[\"credit\"]:\n",
+        "            print(\"Erreur : compte manquant\")\n",
+        "            erreurs += 1\n",
+        "\n",
+        "        if op[\"debit\"] == op[\"credit\"]:\n",
+        "            print(\"Erreur : debit et credit identiques\")\n",
+        "            erreurs += 1\n",
+        "\n",
+        "        if not op[\"date\"] or not op[\"libelle\"]:\n",
+        "            print(\"Erreur : date ou libelle manquant\")\n",
+        "            erreurs += 1\n",
+        "\n",
+        "    if erreurs == 0:\n",
+        "        print(\"Aucune erreur detectee !\")\n",
+        "    else:\n",
+        "        print(\"Nombre d'erreurs :\", erreurs)\n",
+        "\n",
+        "\n",
+        "print(\"Les 4 fonctions COMPTALIA sont pretes !\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wHKaNbxWeky3",
+        "outputId": "cf0bbb40-e145-4300-8da2-193bc9c34268"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "=== AJOUTER UNE OPERATION ===\n",
+            "Date (AAAA-MM-JJ) : 13.11.2026\n",
+            "Libelle : Achat de marsandises\n",
+            "Compte debit : 380\n",
+            "Compte credit : 401\n",
+            "Montant : 1500\n",
+            "Operation ajoutee avec succes !\n"
+          ]
+        }
+      ],
+      "source": [
+        "ajouter_operation()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 508
+        },
+        "id": "sBSW9hJLgQPC",
+        "outputId": "db0a683c-990e-463e-93a9-c959060b9ac6"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "========== JOURNAL COMPTABLE ==========\n"
+          ]
+        },
+        {
+          "ename": "NameError",
+          "evalue": "name 'journal' is not defined",
+          "output_type": "error",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipykernel_523/872444344.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     14\u001b[0m     \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"=======================================\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     15\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 16\u001b[0;31m \u001b[0mafficher_journal\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/tmp/ipykernel_523/872444344.py\u001b[0m in \u001b[0;36mafficher_journal\u001b[0;34m()\u001b[0m\n\u001b[1;32m      2\u001b[0m     \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"========== JOURNAL COMPTABLE ==========\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 4\u001b[0;31m     \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mjournal\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      5\u001b[0m         \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Aucune operation enregistree.\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mNameError\u001b[0m: name 'journal' is not defined"
+          ]
+        }
+      ],
+      "source": [
+        "def afficher_journal():\n",
+        "    print(\"========== JOURNAL COMPTABLE ==========\")\n",
+        "\n",
+        "    if not journal:\n",
+        "        print(\"Aucune operation enregistree.\")\n",
+        "    else:\n",
+        "        for operation in journal:\n",
+        "            print(\"----------------------------\")\n",
+        "            print(\"Date :\", operation[\"date\"])\n",
+        "            print(\"Libelle :\", operation[\"libelle\"])\n",
+        "            print(\"Debit :\", operation[\"debit\"])\n",
+        "            print(\"Credit :\", operation[\"credit\"])\n",
+        "\n",
+        "    print(\"=======================================\")\n",
+        "\n",
+        "afficher_journal()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "V7qfCQwCg2OS",
+        "outputId": "b14ffcf9-590a-4dd1-ba55-d0cc4d7dfd46"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "========== JOURNAL COMPTABLE ==========\n",
+            "Aucune operation enregistree.\n",
+            "=======================================\n"
+          ]
+        }
+      ],
+      "source": [
+        "journal = []\n",
+        "\n",
+        "def afficher_journal():\n",
+        "    print(\"========== JOURNAL COMPTABLE ==========\")\n",
+        "\n",
+        "    if not journal:\n",
+        "        print(\"Aucune operation enregistree.\")\n",
+        "    else:\n",
+        "        for operation in journal:\n",
+        "            print(operation)\n",
+        "\n",
+        "    print(\"=======================================\")\n",
+        "\n",
+        "afficher_journal()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "z1JpWJazhRGW",
+        "outputId": "91e04704-3c66-417b-c7fe-9e9a21bb25ab"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Total Debit : 0\n",
+            "Total Credit : 0\n",
+            "Solde : 0\n"
+          ]
+        }
+      ],
+      "source": [
+        "def calculer_solde():\n",
+        "    total_debit = sum(op[\"debit\"] for op in journal)\n",
+        "    total_credit = sum(op[\"credit\"] for op in journal)\n",
+        "\n",
+        "    solde = total_debit - total_credit\n",
+        "\n",
+        "    print(\"Total Debit :\", total_debit)\n",
+        "    print(\"Total Credit :\", total_credit)\n",
+        "    print(\"Solde :\", solde)\n",
+        "\n",
+        "calculer_solde()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DHP8QQPtim2A",
+        "outputId": "055e9c95-7307-4c2f-baed-2e6cdf1df7f0"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Operation introuvable.\n"
+          ]
+        }
+      ],
+      "source": [
+        "def rechercher_operation(libelle):\n",
+        "    for operation in journal:\n",
+        "        if operation[\"libelle\"].lower() == libelle.lower():\n",
+        "            print(\"Operation trouvee :\", operation)\n",
+        "            return\n",
+        "\n",
+        "    print(\"Operation introuvable.\")\n",
+        "\n",
+        "rechercher_operation(\"Achat\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RrXbG5oejInJ",
+        "outputId": "e617369c-b43e-4979-f4d6-bff664139a3d"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Operation introuvable.\n"
+          ]
+        }
+      ],
+      "source": [
+        "def supprimer_operation(libelle):\n",
+        "    for operation in journal:\n",
+        "        if operation[\"libelle\"].lower() == libelle.lower():\n",
+        "            journal.remove(operation)\n",
+        "            print(\"Operation supprimee avec succes !\")\n",
+        "            return\n",
+        "\n",
+        "    print(\"Operation introuvable.\")\n",
+        "\n",
+        "supprimer_operation(\"Achat\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "e1SKtVATkh9G",
+        "outputId": "d807fd15-8b55-47b2-c360-47386fc68fa8"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Operation ajoutee avec succes !\n",
+            "========== JOURNAL COMPTABLE ==========\n",
+            "{'date': '13/11/2026', 'libelle': 'Achat', 'debit': 15000, 'credit': 15000}\n",
+            "=======================================\n",
+            "Total Debit : 15000\n",
+            "Total Credit : 15000\n",
+            "Solde : 0\n",
+            "Comptabilite equilibree !\n"
+          ]
+        }
+      ],
+      "source": [
+        "operation = {\n",
+        "    \"date\": \"13/11/2026\",\n",
+        "    \"libelle\": \"Achat\",\n",
+        "    \"debit\": 15000,\n",
+        "    \"credit\": 15000\n",
+        "}\n",
+        "\n",
+        "journal.append(operation)\n",
+        "\n",
+        "print(\"Operation ajoutee avec succes !\")\n",
+        "afficher_journal()\n",
+        "calculer_solde()\n",
+        "verifier_equilibre()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-dfnTwTVmMUT",
+        "outputId": "4c7b70d4-959a-4f25-968f-0246a2d9a135"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "\n",
+            "========== COMPTALIA ==========\n",
+            "1. Ajouter une operation\n",
+            "2. Afficher le journal\n",
+            "3. Calculer le solde\n",
+            "4. Verifier l'equilibre\n",
+            "5. Rechercher une operation\n",
+            "6. Supprimer une operation\n",
+            "0. Quitter\n",
+            "==============================\n",
+            "\n",
+            "===== JOURNAL COMPTABLE =====\n",
+            "{'date': '13/11/2026', 'libelle': 'Achat', 'debit': 15000, 'credit': 15000}\n",
+            "\n",
+            "========== COMPTALIA ==========\n",
+            "1. Ajouter une operation\n",
+            "2. Afficher le journal\n",
+            "3. Calculer le solde\n",
+            "4. Verifier l'equilibre\n",
+            "5. Rechercher une operation\n",
+            "6. Supprimer une operation\n",
+            "0. Quitter\n",
+            "==============================\n",
+            "\n",
+            "===== JOURNAL COMPTABLE =====\n",
+            "{'date': '13/11/2026', 'libelle': 'Achat', 'debit': 15000, 'credit': 15000}\n",
+            "\n",
+            "========== COMPTALIA ==========\n",
+            "1. Ajouter une operation\n",
+            "2. Afficher le journal\n",
+            "3. Calculer le solde\n",
+            "4. Verifier l'equilibre\n",
+            "5. Rechercher une operation\n",
+            "6. Supprimer une operation\n",
+            "0. Quitter\n",
+            "==============================\n",
+            "\n",
+            "===== JOURNAL COMPTABLE =====\n",
+            "{'date': '13/11/2026', 'libelle': 'Achat', 'debit': 15000, 'credit': 15000}\n",
+            "\n",
+            "========== COMPTALIA ==========\n",
+            "1. Ajouter une operation\n",
+            "2. Afficher le journal\n",
+            "3. Calculer le solde\n",
+            "4. Verifier l'equilibre\n",
+            "5. Rechercher une operation\n",
+            "6. Supprimer une operation\n",
+            "0. Quitter\n",
+            "==============================\n",
+            "\n",
+            "===== JOURNAL COMPTABLE =====\n",
+            "{'date': '13/11/2026', 'libelle': 'Achat', 'debit': 15000, 'credit': 15000}\n",
+            "\n",
+            "========== COMPTALIA ==========\n",
+            "1. Ajouter une operation\n",
+            "2. Afficher le journal\n",
+            "3. Calculer le solde\n",
+            "4. Verifier l'equilibre\n",
+            "5. Rechercher une operation\n",
+            "6. Supprimer une operation\n",
+            "0. Quitter\n",
+            "==============================\n",
+            "Votre choix : 0\n",
+            "Merci d'utiliser COMPTALIA !\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "if \"journal\" not in globals():\n",
+        "    journal = []\n",
+        "\n",
+        "def ajouter_operation():\n",
+        "    date = input(\"Date : \")\n",
+        "    libelle = input(\"Libelle : \")\n",
+        "    debit = float(input(\"Debit : \"))\n",
+        "    credit = float(input(\"Credit : \"))\n",
+        "\n",
+        "    operation = {\n",
+        "        \"date\": date,\n",
+        "        \"libelle\": libelle,\n",
+        "        \"debit\": debit,\n",
+        "        \"credit\": credit\n",
+        "    }\n",
+        "\n",
+        "    journal.append(operation)\n",
+        "    print(\"Operation ajoutee avec succes !\")\n",
+        "\n",
+        "\n",
+        "def afficher_journal():\n",
+        "    print(\"\\n===== JOURNAL COMPTABLE =====\")\n",
+        "    for operation in journal:\n",
+        "        print(operation)\n",
+        "    if not journal:\n",
+        "        print(\"Journal vide.\")\n",
+        "\n",
+        "\n",
+        "def calculer_solde():\n",
+        "    debit = sum(op[\"debit\"] for op in journal)\n",
+        "    credit = sum(op[\"credit\"] for op in journal)\n",
+        "    print(\"Total Debit :\", debit)\n",
+        "    print(\"Total Credit :\", credit)\n",
+        "    print(\"Solde :\", debit - credit)\n",
+        "\n",
+        "\n",
+        "def verifier_equilibre():\n",
+        "    debit = sum(op[\"debit\"] for op in journal)\n",
+        "    credit = sum(op[\"credit\"] for op in journal)\n",
+        "\n",
+        "    if debit == credit:\n",
+        "        print(\"Comptabilite equilibree !\")\n",
+        "    else:\n",
+        "        print(\"Erreur : Debit different du Credit !\")\n",
+        "\n",
+        "\n",
+        "def rechercher_operation():\n",
+        "    nom = input(\"Libelle a rechercher : \").lower()\n",
+        "\n",
+        "    for op in journal:\n",
+        "        if op[\"libelle\"].lower() == nom:\n",
+        "            print(\"Operation trouvee :\", op)\n",
+        "            return\n",
+        "\n",
+        "    print(\"Operation introuvable.\")\n",
+        "\n",
+        "\n",
+        "def supprimer_operation():\n",
+        "    nom = input(\"Libelle a supprimer : \").lower()\n",
+        "\n",
+        "    for op in journal:\n",
+        "        if op[\"libelle\"].lower() == nom:\n",
+        "            journal.remove(op)\n",
+        "            print(\"Operation supprimee avec succes !\")\n",
+        "            return\n",
+        "\n",
+        "    print(\"Operation introuvable.\")\n",
+        "\n",
+        "\n",
+        "def comptalia():\n",
+        "    while True:\n",
+        "        print(\"\\n========== COMPTALIA ==========\")\n",
+        "        print(\"1. Ajouter une operation\")\n",
+        "        print(\"2. Afficher le journal\")\n",
+        "        print(\"3. Calculer le solde\")\n",
+        "        print(\"4. Verifier l'equilibre\")\n",
+        "        print(\"5. Rechercher une operation\")\n",
+        "        print(\"6. Supprimer une operation\")\n",
+        "        print(\"0. Quitter\")\n",
+        "        print(\"==============================\")\n",
+        "\n",
+        "        choix = input(\"Votre choix : \")\n",
+        "\n",
+        "        if choix == \"1\":\n",
+        "            ajouter_operation()\n",
+        "        elif choix == \"2\":\n",
+        "            afficher_journal()\n",
+        "        elif choix == \"3\":\n",
+        "            calculer_solde()\n",
+        "        elif choix == \"4\":\n",
+        "            verifier_equilibre()\n",
+        "        elif choix == \"5\":\n",
+        "            rechercher_operation()\n",
+        "        elif choix == \"6\":\n",
+        "            supprimer_operation()\n",
+        "        elif choix == \"0\":\n",
+        "            print(\"Merci d'utiliser COMPTALIA !\")\n",
+        "            break\n",
+        "        else:\n",
+        "            print(\"Choix invalide !\")\n",
+        "\n",
+        "\n",
+        "comptalia()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "raySJqY99xvw",
+        "outputId": "3a7b64d9-a8a2-4022-c631-f5ae53f28555"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "\n",
+            "===== COMPTALIA =====\n",
+            "1 - Ajouter une operation\n",
+            "2 - Afficher le journal\n",
+            "3 - Verifier l'equilibre\n",
+            "0 - Quitter\n",
+            "Compte credit: 401\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "def menu():\n",
+        "    while True:\n",
+        "        print(\"\\n===== COMPTALIA =====\")\n",
+        "        print(\"1 - Ajouter une operation\")\n",
+        "        print(\"2 - Afficher le journal\")\n",
+        "        print(\"3 - Verifier l'equilibre\")\n",
+        "        print(\"0 - Quitter\")\n",
+        "\n",
+        "        choix = input(\"Votre choix: \")\n",
+        "\n",
+        "        if choix == \"1\":\n",
+        "            date = input(\"Date: \")\n",
+        "            libelle = input(\"Libelle: \")\n",
+        "            debit = input(\"Compte debit: \")\n",
+        "            credit = input(\"Compte credit: \")\n",
+        "\n",
+        "            try:\n",
+        "                montant = float(input(\"Montant: \"))\n",
+        "                resultat = ajouter_operation(\n",
+        "                    date, libelle, debit, credit, montant\n",
+        "                )\n",
+        "                print(resultat)\n",
+        "            except ValueError:\n",
+        "                print(\"Montant invalide\")\n",
+        "\n",
+        "        elif choix == \"2\":\n",
+        "            afficher_journal()\n",
+        "\n",
+        "        elif choix == \"3\":\n",
+        "            print(\"Total debit et credit:\")\n",
+        "            print(verifier_equilibre())\n",
+        "\n",
+        "        elif choix == \"0\":\n",
+        "            print(\"Au revoir!\")\n",
+        "            break\n",
+        "\n",
+        "        else:\n",
+        "            print(\"Choix invalide\")\n",
+        "\n",
+        "menu()"
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
