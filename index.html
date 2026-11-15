@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPTALIA</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f1f4f9;
+    margin: 0;
+    padding: 20px;
+    color: #172554;
+}
+header {
+    background: #123b65;
+    color: white;
+    text-align: center;
+    padding: 25px;
+    border-radius: 15px;
+}
+.card {
+    background: white;
+    padding: 18px;
+    margin-top: 18px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #ddd;
+}
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+input { border: 1px solid #ccc; }
+button {
+    background: #1769aa;
+    color: white;
+    border: none;
+    font-size: 16px;
+}
+.operation {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>COMPTALIA</h1>
+<p>Gestion comptable intelligente</p>
+</header>
+
+<div class="card">
+<h2>Ajouter une opération</h2>
+<input id="date" type="date">
+<input id="libelle" placeholder="Libellé">
+<input id="debit" placeholder="Compte débit">
+<input id="credit" placeholder="Compte crédit">
+<input id="montant" type="number" placeholder="Montant">
+
+<button onclick="ajouter()">Ajouter</button>
+</div>
+
+<div class="card">
+<h2>Journal comptable</h2>
+<div id="journal"></div>
+</div>
+
+<div class="card">
+<h2>Calcul des soldes</h2>
+<p id="total">Total des opérations : 0 DA</p>
+<p id="equilibre">Comptabilité équilibrée</p>
+<button onclick="calculer()">Calculer</button>
+</div>
+
+<script>
+let operations = [];
+
+function ajouter() {
+    let date = document.getElementById("date").value;
+    let libelle = document.getElementById("libelle").value;
+    let debit = document.getElementById("debit").value;
+    let credit = document.getElementById("credit").value;
+    let montant = Number(document.getElementById("montant").value);
+
+    if (!date || !libelle || !debit || !credit ||
+        debit === credit || montant <= 0) {
+        alert("Veuillez vérifier les informations !");
+        return;
+    }
+
+    operations.push({date, libelle, debit, credit, montant});
+    afficher();
+    alert("Operation ajoutee avec succes !");
+}
+
+function afficher() {
+    let journal = document.getElementById("journal");
+    journal.innerHTML = "";
+
+    operations.forEach(op => {
+        journal.innerHTML += `
+        <div class="operation">
+        Date : ${op.date}<br>
+        Libellé : ${op.libelle}<br>
+        Débit : ${op.debit}<br>
+        Crédit : ${op.credit}<br>
+        Montant : ${op.montant} DA
+        </div>`;
+    });
+}
+
+function calculer() {
+    let total = operations.reduce((s, op) => s + op.montant, 0);
+    document.getElementById("total").innerText =
+        "Total des opérations : " + total + " DA";
+
+    document.getElementById("equilibre").innerText =
+        "Nombre d'opérations : " + operations.length;
+}
+</script>
+
+</body>
+</html>
