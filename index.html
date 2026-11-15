@@ -1,16 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COMPTALIA</title>
+
 <style>
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background: #f1f4f9;
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     color: #172554;
 }
 header {
@@ -34,7 +34,9 @@ input, button {
     box-sizing: border-box;
     border-radius: 8px;
 }
-input { border: 1px solid #ccc; }
+input {
+    border: 1px solid #ccc;
+}
 button {
     background: #1769aa;
     color: white;
@@ -42,27 +44,36 @@ button {
     font-size: 16px;
 }
 .operation {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
+    background: #f1f4f9;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+.delete {
+    background: #c0392b;
 }
 </style>
 </head>
+
 <body>
 
 <header>
 <h1>COMPTALIA</h1>
 <p>Gestion comptable intelligente</p>
+<p>Votre assistant comptable</p>
 </header>
 
 <div class="card">
 <h2>Ajouter une opération</h2>
+
 <input id="date" type="date">
 <input id="libelle" placeholder="Libellé">
 <input id="debit" placeholder="Compte débit">
 <input id="credit" placeholder="Compte crédit">
 <input id="montant" type="number" placeholder="Montant">
 
-<button onclick="ajouter()">Ajouter</button>
+<button onclick="ajouter()">Ajouter l'opération</button>
+<p id="message"></p>
 </div>
 
 <div class="card">
@@ -72,56 +83,135 @@ button {
 
 <div class="card">
 <h2>Calcul des soldes</h2>
-<p id="total">Total des opérations : 0 DA</p>
-<p id="equilibre">Comptabilité équilibrée</p>
+<p id="totalDebit">Total débit : 0 DA</p>
+<p id="totalCredit">Total crédit : 0 DA</p>
+<p id="solde">Solde : 0 DA</p>
+<p id="equilibre"></p>
 <button onclick="calculer()">Calculer</button>
 </div>
 
 <script>
-let operations = [];
+
+let operations = JSON.parse(
+    localStorage.getItem("comptalia_operations") || "[]"
+);
+
+function sauvegarder() {
+    localStorage.setItem(
+        "comptalia_operations",
+        JSON.stringify(operations)
+    );
+}
 
 function ajouter() {
+
     let date = document.getElementById("date").value;
-    let libelle = document.getElementById("libelle").value;
-    let debit = document.getElementById("debit").value;
-    let credit = document.getElementById("credit").value;
+    let libelle = document.getElementById("libelle").value.trim();
+    let debit = document.getElementById("debit").value.trim();
+    let credit = document.getElementById("credit").value.trim();
     let montant = Number(document.getElementById("montant").value);
 
     if (!date || !libelle || !debit || !credit ||
-        debit === credit || montant <= 0) {
+        debit === credit || !Number.isFinite(montant) || montant <= 0) {
         alert("Veuillez vérifier les informations !");
         return;
     }
 
-    operations.push({date, libelle, debit, credit, montant});
+    operations.push({
+        id: Date.now(),
+        date,
+        libelle,
+        debit,
+        credit,
+        montant
+    });
+
+    sauvegarder();
     afficher();
-    alert("Operation ajoutee avec succes !");
+    calculer();
+
+    document.getElementById("message").innerText =
+        "Opération ajoutée et sauvegardée !";
+
+    document.getElementById("libelle").value = "";
+    document.getElementById("debit").value = "";
+    document.getElementById("credit").value = "";
+    document.getElementById("montant").value = "";
 }
 
 function afficher() {
+
     let journal = document.getElementById("journal");
     journal.innerHTML = "";
 
+    if (operations.length === 0) {
+        journal.innerHTML = "Aucune opération enregistrée.";
+        return;
+    }
+
     operations.forEach(op => {
-        journal.innerHTML += `
-        <div class="operation">
-        Date : ${op.date}<br>
-        Libellé : ${op.libelle}<br>
-        Débit : ${op.debit}<br>
-        Crédit : ${op.credit}<br>
-        Montant : ${op.montant} DA
-        </div>`;
+
+        let div = document.createElement("div");
+        div.className = "operation";
+
+        let details = document.createElement("p");
+        details.textContent =
+            "Date : " + op.date +
+            " | Libellé : " + op.libelle +
+            " | Débit : " + op.debit +
+            " | Crédit : " + op.credit +
+            " | Montant : " + op.montant + " DA";
+
+        let bouton = document.createElement("button");
+        bouton.className = "delete";
+        bouton.textContent = "Supprimer";
+
+        bouton.onclick = function() {
+            supprimer(op.id);
+        };
+
+        div.appendChild(details);
+        div.appendChild(bouton);
+        journal.appendChild(div);
     });
 }
 
 function calculer() {
-    let total = operations.reduce((s, op) => s + op.montant, 0);
-    document.getElementById("total").innerText =
-        "Total des opérations : " + total + " DA";
+
+    let totalDebit = operations.reduce(
+        (s, op) => s + op.montant, 0
+    );
+
+    let totalCredit = operations.reduce(
+        (s, op) => s + op.montant, 0
+    );
+
+    document.getElementById("totalDebit").innerText =
+        "Total débit : " + totalDebit + " DA";
+
+    document.getElementById("totalCredit").innerText =
+        "Total crédit : " + totalCredit + " DA";
+
+    document.getElementById("solde").innerText =
+        "Solde global : " + (totalDebit - totalCredit) + " DA";
 
     document.getElementById("equilibre").innerText =
-        "Nombre d'opérations : " + operations.length;
+        "Vérification : chaque opération possède un débit et un crédit du même montant.";
 }
+
+function supprimer(id) {
+
+    if (confirm("Supprimer cette opération ?")) {
+        operations = operations.filter(op => op.id !== id);
+        sauvegarder();
+        afficher();
+        calculer();
+    }
+}
+
+afficher();
+calculer();
+
 </script>
 
 </body>
