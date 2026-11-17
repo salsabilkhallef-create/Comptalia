@@ -1,218 +1,321 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COMPTALIA</title>
-
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f1f4f9;
-    margin: 0;
-    padding: 15px;
-    color: #172554;
-}
-header {
-    background: #123b65;
-    color: white;
-    text-align: center;
-    padding: 25px;
-    border-radius: 15px;
-}
-.card {
-    background: white;
-    padding: 18px;
-    margin-top: 18px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px #ddd;
-}
-input, button {
-    width: 100%;
-    padding: 12px;
-    margin: 7px 0;
-    box-sizing: border-box;
-    border-radius: 8px;
-}
-input {
-    border: 1px solid #ccc;
-}
-button {
-    background: #1769aa;
-    color: white;
-    border: none;
-    font-size: 16px;
-}
-.operation {
-    background: #f1f4f9;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 8px;
-}
-.delete {
-    background: #c0392b;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f1f4f9;color:#243047}
+header{background:#142b4a;color:white;padding:22px;text-align:center}
+header h1{margin:0;color:#54d6bd}
+header p{margin:8px 0 0}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:15px;background:white}
+button{border:0;border-radius:7px;padding:11px 15px;background:#176b87;color:white;cursor:pointer}
+button:hover{opacity:.85}
+nav button{background:#203c5c}
+main{padding:18px;max-width:1200px;margin:auto}
+section{display:none}
+section.active{display:block}
+h2{color:#176b87}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+.card{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px #0001}
+.card strong{font-size:25px;color:#176b87;display:block;margin-top:12px}
+.panel{background:white;padding:17px;border-radius:12px;margin:15px 0;overflow-x:auto}
+input,select{padding:10px;border:1px solid #ccd5df;border-radius:6px;margin:4px;max-width:100%}
+table{width:100%;border-collapse:collapse;min-width:700px;margin-top:15px}
+th,td{border:1px solid #dce3ec;padding:10px;text-align:center}
+th{background:#203c5c;color:white}
+tr:nth-child(even){background:#f4f7fa}
+.delete{background:#c0392b}
+.edit{background:#d18a16}
+.primary{background:#16866f}
+.form{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.small{padding:7px}
+footer{text-align:center;padding:20px;color:#607080}
 </style>
 </head>
-
 <body>
 
 <header>
 <h1>COMPTALIA</h1>
-<p>Gestion comptable intelligente</p>
-<p>Votre assistant comptable</p>
+<p>Gestion comptable et financière</p>
 </header>
 
-<div class="card">
-<h2>Ajouter une opération</h2>
+<nav>
+<button onclick="show('dashboard')">Tableau de bord</button>
+<button onclick="show('journal')">Journal</button>
+<button onclick="show('ledger')">Grand livre</button>
+<button onclick="show('balance')">Balance</button>
+<button onclick="show('accounts')">Comptes</button>
+</nav>
 
-<input id="date" type="date">
-<input id="libelle" placeholder="Libellé">
-<input id="debit" placeholder="Compte débit">
-<input id="credit" placeholder="Compte crédit">
-<input id="montant" type="number" placeholder="Montant">
+<main>
 
-<button onclick="ajouter()">Ajouter l'opération</button>
-<p id="message"></p>
+<section id="dashboard" class="active">
+<h2>Tableau de bord</h2>
+<div class="cards">
+<div class="card">Nombre d'opérations<strong id="operations">0</strong></div>
+<div class="card">Total débit<strong id="debit">0.00</strong></div>
+<div class="card">Total crédit<strong id="credit">0.00</strong></div>
+<div class="card">Nombre de comptes<strong id="count">0</strong></div>
 </div>
+<div class="panel">
+<h3>Bienvenue dans COMPTALIA</h3>
+<p>Votre espace de gestion comptable.</p>
+<p id="status">Données sauvegardées automatiquement.</p>
+</div>
+</section>
 
-<div class="card">
+<section id="journal">
 <h2>Journal comptable</h2>
-<div id="journal"></div>
+<div class="panel">
+<h3>Ajouter une opération</h3>
+<div class="form">
+<input type="date" id="date">
+<input id="ref" placeholder="N° pièce">
+<input id="description" placeholder="Libellé / Description">
+<input id="account" placeholder="N° compte">
+<input id="accountName" placeholder="Nom du compte">
+<input type="number" id="amountDebit" placeholder="Débit">
+<input type="number" id="amountCredit" placeholder="Crédit">
+<button class="primary" onclick="addEntry()">Ajouter</button>
+<button onclick="cancelEdit()">Annuler</button>
 </div>
+</div>
+<div class="panel">
+<h3>Liste des opérations</h3>
+<table>
+<thead><tr>
+<th>Date</th><th>Référence</th><th>Description</th>
+<th>N° compte</th><th>Compte</th><th>Débit</th>
+<th>Crédit</th><th>Actions</th>
+</tr></thead>
+<tbody id="journalRows"></tbody>
+<tfoot><tr><th colspan="5">Totaux</th>
+<th id="totalDebit">0.00</th>
+<th id="totalCredit">0.00</th><th></th></tr></tfoot>
+</table>
+</div>
+</section>
 
-<div class="card">
-<h2>Calcul des soldes</h2>
-<p id="totalDebit">Total débit : 0 DA</p>
-<p id="totalCredit">Total crédit : 0 DA</p>
-<p id="solde">Solde : 0 DA</p>
-<p id="equilibre"></p>
-<button onclick="calculer()">Calculer</button>
+<section id="ledger">
+<h2>Grand livre</h2>
+<div class="panel">
+<input id="ledgerSearch" placeholder="Rechercher un compte..." oninput="renderLedger()">
+<table>
+<thead><tr><th>Date</th><th>Compte</th><th>Description</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead>
+<tbody id="ledgerRows"></tbody>
+</table>
 </div>
+</section>
+
+<section id="balance">
+<h2>Balance comptable</h2>
+<div class="panel">
+<table>
+<thead><tr>
+<th>N° compte</th><th>Intitulé</th>
+<th>Total débit</th><th>Total crédit</th>
+<th>Solde débiteur</th><th>Solde créditeur</th>
+</tr></thead>
+<tbody id="balanceRows"></tbody>
+<tfoot><tr><th colspan="2">TOTAL</th>
+<th id="balanceDebit">0.00</th>
+<th id="balanceCredit">0.00</th>
+<th id="balanceSD">0.00</th>
+<th id="balanceSC">0.00</th></tr></tfoot>
+</table>
+</div>
+</section>
+
+<section id="accounts">
+<h2>Gestion des comptes</h2>
+<div class="panel">
+<div class="form">
+<input id="newCode" placeholder="Numéro de compte">
+<input id="newName" placeholder="Intitulé du compte">
+<button class="primary" onclick="addAccount()">Ajouter un compte</button>
+</div>
+<table>
+<thead><tr><th>Numéro</th><th>Intitulé</th><th>Actions</th></tr></thead>
+<tbody id="accountRows"></tbody>
+</table>
+</div>
+</section>
+
+</main>
+<footer>COMPTALIA © 2026 - Gestion comptable</footer>
 
 <script>
+let entries=JSON.parse(localStorage.getItem("comptalia_entries")||"[]");
+let accounts=JSON.parse(localStorage.getItem("comptalia_accounts")||"[]");
+let editing=-1;
 
-let operations = JSON.parse(
-    localStorage.getItem("comptalia_operations") || "[]"
-);
-
-function sauvegarder() {
-    localStorage.setItem(
-        "comptalia_operations",
-        JSON.stringify(operations)
-    );
+function save(){
+ localStorage.setItem("comptalia_entries",JSON.stringify(entries));
+ localStorage.setItem("comptalia_accounts",JSON.stringify(accounts));
+ document.getElementById("status").textContent="Données sauvegardées automatiquement.";
+ render();
 }
 
-function ajouter() {
-
-    let date = document.getElementById("date").value;
-    let libelle = document.getElementById("libelle").value.trim();
-    let debit = document.getElementById("debit").value.trim();
-    let credit = document.getElementById("credit").value.trim();
-    let montant = Number(document.getElementById("montant").value);
-
-    if (!date || !libelle || !debit || !credit ||
-        debit === credit || !Number.isFinite(montant) || montant <= 0) {
-        alert("Veuillez vérifier les informations !");
-        return;
-    }
-
-    operations.push({
-        id: Date.now(),
-        date,
-        libelle,
-        debit,
-        credit,
-        montant
-    });
-
-    sauvegarder();
-    afficher();
-    calculer();
-
-    document.getElementById("message").innerText =
-        "Opération ajoutée et sauvegardée !";
-
-    document.getElementById("libelle").value = "";
-    document.getElementById("debit").value = "";
-    document.getElementById("credit").value = "";
-    document.getElementById("montant").value = "";
+function show(id){
+ document.querySelectorAll("main section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ render();
 }
 
-function afficher() {
+function val(id){return document.getElementById(id).value.trim()}
+function money(n){return Number(n||0).toFixed(2)}
 
-    let journal = document.getElementById("journal");
-    journal.innerHTML = "";
+function addEntry(){
+ let date=val("date"),ref=val("ref"),description=val("description");
+ let account=val("account"),accountName=val("accountName");
+ let debit=Number(val("amountDebit")||0),credit=Number(val("amountCredit")||0);
 
-    if (operations.length === 0) {
-        journal.innerHTML = "Aucune opération enregistrée.";
-        return;
-    }
+ if(!date||!description||!account||!accountName){
+  alert("Veuillez remplir les champs obligatoires.");return;
+ }
+ if(debit<0||credit<0||debit===credit){
+  alert("Saisissez un montant positif au débit OU au crédit.");return;
+ }
+ if(editing===-1 && debit!==credit){
+  // Une ligne peut être débit ou crédit, l'équilibre se vérifie sur la pièce complète.
+ }
+ let item={date,ref,description,account,accountName,debit,credit};
+ if(editing>=0)entries[editing]=item;
+ else entries.push(item);
 
-    operations.forEach(op => {
-
-        let div = document.createElement("div");
-        div.className = "operation";
-
-        let details = document.createElement("p");
-        details.textContent =
-            "Date : " + op.date +
-            " | Libellé : " + op.libelle +
-            " | Débit : " + op.debit +
-            " | Crédit : " + op.credit +
-            " | Montant : " + op.montant + " DA";
-
-        let bouton = document.createElement("button");
-        bouton.className = "delete";
-        bouton.textContent = "Supprimer";
-
-        bouton.onclick = function() {
-            supprimer(op.id);
-        };
-
-        div.appendChild(details);
-        div.appendChild(bouton);
-        journal.appendChild(div);
-    });
+ if(!accounts.some(a=>a.code===account)){
+  accounts.push({code:account,name:accountName});
+ }
+ clearForm();save();
 }
 
-function calculer() {
+function clearForm(){
+ ["date","ref","description","account","accountName","amountDebit","amountCredit"].forEach(id=>document.getElementById(id).value="");
+ editing=-1;
+}
+function cancelEdit(){clearForm()}
 
-    let totalDebit = operations.reduce(
-        (s, op) => s + op.montant, 0
-    );
-
-    let totalCredit = operations.reduce(
-        (s, op) => s + op.montant, 0
-    );
-
-    document.getElementById("totalDebit").innerText =
-        "Total débit : " + totalDebit + " DA";
-
-    document.getElementById("totalCredit").innerText =
-        "Total crédit : " + totalCredit + " DA";
-
-    document.getElementById("solde").innerText =
-        "Solde global : " + (totalDebit - totalCredit) + " DA";
-
-    document.getElementById("equilibre").innerText =
-        "Vérification : chaque opération possède un débit et un crédit du même montant.";
+function editEntry(i){
+ let e=entries[i];editing=i;
+ document.getElementById("date").value=e.date;
+ document.getElementById("ref").value=e.ref;
+ document.getElementById("description").value=e.description;
+ document.getElementById("account").value=e.account;
+ document.getElementById("accountName").value=e.accountName;
+ document.getElementById("amountDebit").value=e.debit;
+ document.getElementById("amountCredit").value=e.credit;
+ show("journal");
 }
 
-function supprimer(id) {
-
-    if (confirm("Supprimer cette opération ?")) {
-        operations = operations.filter(op => op.id !== id);
-        sauvegarder();
-        afficher();
-        calculer();
-    }
+function deleteEntry(i){
+ if(confirm("Supprimer cette opération ?")){
+  entries.splice(i,1);save();
+ }
 }
 
-afficher();
-calculer();
+function addAccount(){
+ let code=val("newCode"),name=val("newName");
+ if(!code||!name){alert("Remplissez les deux champs.");return}
+ if(accounts.some(a=>a.code===code)){alert("Ce compte existe déjà.");return}
+ accounts.push({code,name});
+ document.getElementById("newCode").value="";
+ document.getElementById("newName").value="";
+ save();
+}
 
+function deleteAccount(i){
+ if(confirm("Supprimer ce compte ?")){
+  accounts.splice(i,1);save();
+ }
+}
+
+function renderJournal(){
+ let html="",d=0,c=0;
+ entries.forEach((e,i)=>{
+ d+=e.debit;c+=e.credit;
+ html+=`<tr>
+ <td>${e.date}</td><td>${escapeHTML(e.ref)}</td>
+ <td>${escapeHTML(e.description)}</td>
+ <td>${escapeHTML(e.account)}</td><td>${escapeHTML(e.accountName)}</td>
+ <td>${money(e.debit)}</td><td>${money(e.credit)}</td>
+ <td><button class="edit small" onclick="editEntry(${i})">Modifier</button>
+ <button class="delete small" onclick="deleteEntry(${i})">Supprimer</button></td>
+ </tr>`;
+ });
+ document.getElementById("journalRows").innerHTML=html;
+ document.getElementById("totalDebit").textContent=money(d);
+ document.getElementById("totalCredit").textContent=money(c);
+}
+
+function escapeHTML(s){
+ return String(s??"").replace(/[&<>"']/g,ch=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[ch]);
+}
+
+function grouped(){
+ let groups={};
+ entries.forEach(e=>{
+ let k=e.account;
+ if(!groups[k])groups[k]={code:k,name:e.accountName,debit:0,credit:0};
+ groups[k].debit+=e.debit;groups[k].credit+=e.credit;
+ });
+ return Object.values(groups);
+}
+
+function renderLedger(){
+ let search=val("ledgerSearch").toLowerCase(),html="",running={};
+ entries.filter(e=>(e.account+" "+e.accountName).toLowerCase().includes(search))
+ .forEach(e=>{
+  running[e.account]=(running[e.account]||0)+e.debit-e.credit;
+  html+=`<tr><td>${e.date}</td><td>${escapeHTML(e.account)} - ${escapeHTML(e.accountName)}</td>
+  <td>${escapeHTML(e.description)}</td><td>${money(e.debit)}</td>
+  <td>${money(e.credit)}</td><td>${money(running[e.account])}</td></tr>`;
+ });
+ document.getElementById("ledgerRows").innerHTML=html;
+}
+
+function renderBalance(){
+ let groups=grouped(),html="",td=0,tc=0,sd=0,sc=0;
+ groups.forEach(g=>{
+ let balance=g.debit-g.credit;
+ let bd=Math.max(balance,0),bc=Math.max(-balance,0);
+ td+=g.debit;tc+=g.credit;sd+=bd;sc+=bc;
+ html+=`<tr><td>${escapeHTML(g.code)}</td><td>${escapeHTML(g.name)}</td>
+ <td>${money(g.debit)}</td><td>${money(g.credit)}</td>
+ <td>${money(bd)}</td><td>${money(bc)}</td></tr>`;
+ });
+ document.getElementById("balanceRows").innerHTML=html;
+ ["balanceDebit","balanceCredit","balanceSD","balanceSC"].forEach((id,i)=>{
+  document.getElementById(id).textContent=money([td,tc,sd,sc][i]);
+ });
+}
+
+function renderAccounts(){
+ document.getElementById("accountRows").innerHTML=accounts.map((a,i)=>
+ `<tr><td>${escapeHTML(a.code)}</td><td>${escapeHTML(a.name)}</td>
+ <td><button class="delete small" onclick="deleteAccount(${i})">Supprimer</button></td></tr>`
+ ).join("");
+}
+
+function renderDashboard(){
+ let d=entries.reduce((s,e)=>s+e.debit,0);
+ let c=entries.reduce((s,e)=>s+e.credit,0);
+ document.getElementById("operations").textContent=entries.length;
+ document.getElementById("debit").textContent=money(d);
+ document.getElementById("credit").textContent=money(c);
+ document.getElementById("count").textContent=accounts.length;
+}
+
+function render(){
+ renderJournal();renderLedger();renderBalance();renderAccounts();renderDashboard();
+}
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+render();
 </script>
-
 </body>
 </html>
