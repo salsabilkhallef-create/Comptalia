@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPTALIA - Gestion Comptable</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5f9;color:#243047}
+header{background:#142b4a;color:white;padding:20px;text-align:center}
+header h1{margin:0;font-size:27px}
+header p{margin:7px 0 0;color:#d7e4f5}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px;background:white;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px #ddd}
+nav button{background:#e8edf5;color:#142b4a;border:0;padding:11px 13px;border-radius:7px;font-weight:bold;cursor:pointer}
+nav button.active,nav button:hover{background:#1764a5;color:white}
+main{padding:15px;max-width:1200px;margin:auto}
+.page{display:none}
+.page.active{display:block}
+h2{color:#173b63;margin-top:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.card{background:white;padding:18px;border-radius:10px;box-shadow:0 2px 8px #0001}
+.card span{color:#65748b;font-size:14px}
+.card strong{display:block;font-size:23px;margin-top:9px;color:#1764a5}
+.panel{background:white;padding:17px;border-radius:10px;margin:14px 0;box-shadow:0 2px 8px #0001}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label{display:block;font-weight:bold;font-size:14px;margin-bottom:6px}
+input,select{width:100%;padding:11px;border:1px solid #ccd4df;border-radius:6px;font-size:15px;background:white}
+button.action{border:0;padding:11px 16px;border-radius:6px;background:#1764a5;color:white;font-weight:bold;cursor:pointer;margin:5px 3px 0 0}
+button.danger{background:#c0392b}
+button.secondary{background:#52657c}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;min-width:650px;background:white}
+th,td{border:1px solid #dce2ea;padding:10px;text-align:center;font-size:14px}
+th{background:#eaf0f7;color:#173b63}
+tr:nth-child(even){background:#f8fafc}
+.notice{padding:12px;background:#eef5ff;border-left:4px solid #1764a5;border-radius:5px;margin:12px 0}
+.good{color:#16834a;font-weight:bold}
+.bad{color:#c0392b;font-weight:bold}
+footer{text-align:center;padding:20px;color:#748095;font-size:13px}
+@media(max-width:600px){main{padding:9px}nav{position:static}nav button{flex:1}header h1{font-size:23px}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>COMPTALIA</h1>
+<p>Application de gestion comptable</p>
+</header>
+
+<nav>
+<button class="active" onclick="showPage('dashboard',this)">Tableau de bord</button>
+<button onclick="showPage('add',this)">Ajouter</button>
+<button onclick="showPage('journal',this)">Journal</button>
+<button onclick="showPage('ledger',this)">Grand livre</button>
+<button onclick="showPage('balance',this)">Balance</button>
+<button onclick="showPage('accounts',this)">Comptes</button>
+</nav>
+
+<main>
+
+<section id="dashboard" class="page active">
+<h2>Tableau de bord</h2>
+<div class="cards">
+<div class="card"><span>Nombre d'écritures</span><strong id="count">0</strong></div>
+<div class="card"><span>Total débit</span><strong id="totalDebit">0,00</strong></div>
+<div class="card"><span>Total crédit</span><strong id="totalCredit">0,00</strong></div>
+<div class="card"><span>État comptable</span><strong id="status">Équilibré</strong></div>
+</div>
+<div class="panel">
+<h3>Dernières opérations</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Libellé</th><th>Compte</th><th>Débit</th><th>Crédit</th></tr></thead>
+<tbody id="recentRows"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="add" class="page">
+<h2>Ajouter une opération comptable</h2>
+<div class="panel">
+<div class="form-grid">
+<div><label>Date</label><input type="date" id="date"></div>
+<div><label>Référence</label><input id="reference" placeholder="Ex: OP001"></div>
+<div><label>Libellé</label><input id="label" placeholder="Ex: Achat de marchandises"></div>
+<div><label>Compte débité</label><select id="debitAccount"></select></div>
+<div><label>Compte crédité</label><select id="creditAccount"></select></div>
+<div><label>Montant</label><input type="number" id="amount" min="0.01" step="0.01" placeholder="0.00"></div>
+</div>
+<button class="action" onclick="addOperation()">Enregistrer l'opération</button>
+<p class="notice">Chaque opération crée automatiquement deux lignes : une au débit et une au crédit. Les montants doivent être égaux.</p>
+</div>
+</section>
+
+<section id="journal" class="page">
+<h2>Journal comptable</h2>
+<div class="panel">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Référence</th><th>Libellé</th><th>Compte</th><th>Débit</th><th>Crédit</th><th>Action</th></tr></thead>
+<tbody id="journalRows"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="ledger" class="page">
+<h2>Grand livre</h2>
+<div class="panel">
+<label>Choisir un compte</label>
+<select id="ledgerAccount" onchange="renderLedger()"></select>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Référence</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead>
+<tbody id="ledgerRows"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="balance" class="page">
+<h2>Balance générale</h2>
+<div class="panel">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Compte</th><th>Intitulé</th><th>Total débit</th><th>Total crédit</th><th>Solde débiteur</th><th>Solde créditeur</th></tr></thead>
+<tbody id="balanceRows"></tbody>
+<tfoot id="balanceFoot"></tfoot>
+</table>
+</div>
+<p id="balanceStatus" class="notice"></p>
+</div>
+</section>
+
+<section id="accounts" class="page">
+<h2>Plan comptable</h2>
+<div class="panel">
+<h3>Ajouter un compte</h3>
+<div class="form-grid">
+<div><label>Numéro du compte</label><input id="newAccountNumber" placeholder="Ex: 512"></div>
+<div><label>Intitulé du compte</label><input id="newAccountName" placeholder="Ex: Banque"></div>
+</div>
+<button class="action" onclick="addAccount()">Ajouter le compte</button>
+</div>
+<div class="panel">
+<h3>Liste des comptes</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Numéro</th><th>Intitulé</th></tr></thead>
+<tbody id="accountRows"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<div class="panel">
+<h3>Sauvegarde des données</h3>
+<button class="action" onclick="exportData()">Exporter la sauvegarde</button>
+<button class="action secondary" onclick="document.getElementById('importFile').click()">Importer une sauvegarde</button>
+<input type="file" id="importFile" accept=".json" hidden onchange="importData(event)">
+<p class="notice">Les données sont sauvegardées sur ce navigateur et cet appareil. Exportez régulièrement une copie de sécurité.</p>
+</div>
+
+</main>
+
+<footer>COMPTALIA © Gestion comptable</footer>
+
+<script>
+const STORAGE_KEY = "comptalia_data_v1";
+
+const defaultAccounts = [
+["101","Capital"],
+["401","Fournisseurs"],
+["411","Clients"],
+["512","Banque"],
+["530","Caisse"],
+["607","Achats de marchandises"],
+["707","Ventes de marchandises"],
+["445","TVA"],
+["218","Immobilisations"],
+["600","Achats"]
+];
+
+let accounts = defaultAccounts.map(a=>({number:a[0],name:a[1]}));
+let operations = [];
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify({accounts,operations}));
+}
+
+function loadData(){
+  try{
+    const data=JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(data && Array.isArray(data.accounts) && Array.isArray(data.operations)){
+      accounts=data.accounts;
+      operations=data.operations;
+    }
+  }catch(e){
+    console.log("Données locales non disponibles");
+  }
+}
+
+function money(value){
+  return Number(value||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function showPage(id,button){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  if(button)button.classList.add("active");
+  renderAll();
+}
+
+function fillSelects(){
+  const options=accounts.map(a=>`<option value="${a.number}">${a.number} - ${escapeHTML(a.name)}</option>`).join("");
+  document.getElementById("debitAccount").innerHTML=options;
+  document.getElementById("creditAccount").innerHTML=options;
+  document.getElementById("ledgerAccount").innerHTML=options;
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function addOperation(){
+  const date=document.getElementById("date").value;
+  const reference=document.getElementById("reference").value.trim();
+  const label=document.getElementById("label").value.trim();
+  const debit=document.getElementById("debitAccount").value;
+  const credit=document.getElementById("creditAccount").value;
+  const amount=Number(document.getElementById("amount").value);
+
+  if(!date || !label || !debit || !credit || !Number.isFinite(amount) || amount<=0){
+    alert("يرجى ملء جميع المعلومات وإدخال مبلغ صحيح.");
+    return;
+  }
+  if(debit===credit){
+    alert("اختر حسابين مختلفين.");
+    return;
+  }
+
+  const operation={
+    id:Date.now().toString(),
+    date,
+    reference:reference || "OP-"+(operations.length+1),
+    label,
+    debit,
+    credit,
+    amount
+  };
+
+  operations.push(operation);
+  saveData();
+  document.getElementById("reference").value="";
+  document.getElementById("label").value="";
+  document.getElementById("amount").value="";
+  renderAll();
+  alert("تم تسجيل العملية بنجاح.");
+  showPage("journal",document.querySelectorAll("nav button")[2]);
+}
+
+function deleteOperation(id){
+  if(!confirm("هل تريد حذف هذه العملية؟"))return;
+  operations=operations.filter(op=>op.id!==id);
+  saveData();
+  renderAll();
+}
+
+function getAccount(number){
+  return accounts.find(a=>a.number===number) || {number,name:"Compte inconnu"};
+}
+
+function getRows(){
+  let rows=[];
+  operations.forEach(op=>{
+    rows.push({id:op.id,date:op.date,reference:op.reference,label:op.label,account:op.debit,debit:op.amount,credit:0});
+    rows.push({id:op.id,date:op.date,reference:op.reference,label:op.label,account:op.credit,debit:0,credit:op.amount});
+  });
+  return rows.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function renderDashboard(){
+  const rows=getRows();
+  const debit=rows.reduce((s,r)=>s+r.debit,0);
+  const credit=rows.reduce((s,r)=>s+r.credit,0);
+  document.getElementById("count").textContent=operations.length;
+  document.getElementById("totalDebit").textContent=money(debit);
+  document.getElementById("totalCredit").textContent=money(credit);
+  const status=document.getElementById("status");
+  status.textContent=Math.abs(debit-credit)<0.001?"Équilibré":"À vérifier";
+  status.style.color=Math.abs(debit-credit)<0.001?"#16834a":"#c0392b";
+
+  document.getElementById("recentRows").innerHTML=rows.slice(-6).reverse().map(r=>`
+    <tr>
+      <td>${escapeHTML(r.date)}</td>
+      <td>${escapeHTML(r.label)}</td>
+      <td>${escapeHTML(r.account)}</td>
+      <td>${money(r.debit)}</td>
+      <td>${money(r.credit)}</td>
+    </tr>`).join("") || '<tr><td colspan="5">Aucune opération</td></tr>';
+}
+
+function renderJournal(){
+  const rows=getRows();
+  document.getElementById("journalRows").innerHTML=rows.map(r=>`
+    <tr>
+      <td>${escapeHTML(r.date)}</td>
+      <td>${escapeHTML(r.reference)}</td>
+      <td>${escapeHTML(r.label)}</td>
+      <td>${escapeHTML(r.account)} - ${escapeHTML(getAccount(r.account).name)}</td>
+      <td>${money(r.debit)}</td>
+      <td>${money(r.credit)}</td>
+      <td><button class="action danger" onclick="deleteOperation('${r.id}')">Supprimer</button></td>
+    </tr>`).join("") || '<tr><td colspan="7">Aucune opération enregistrée</td></tr>';
+}
+
+function renderLedger(){
+  const selected=document.getElementById("ledgerAccount").value;
+  const rows=getRows().filter(r=>r.account===selected);
+  let balance=0;
+  document.getElementById("ledgerRows").innerHTML=rows.map(r=>{
+    balance+=r.debit-r.credit;
+    return `<tr>
+      <td>${escapeHTML(r.date)}</td>
+      <td>${escapeHTML(r.reference)}</td>
+      <td>${escapeHTML(r.label)}</td>
+      <td>${money(r.debit)}</td>
+      <td>${money(r.credit)}</td>
+      <td>${money(balance)}</td>
+    </tr>`;
+  }).join("") || '<tr><td colspan="6">Aucune écriture pour ce compte</td></tr>';
+}
+
+function renderBalance(){
+  let totalDebit=0,totalCredit=0,totalSD=0,totalSC=0;
+  const rows=accounts.map(a=>{
+    const entries=getRows().filter(r=>r.account===a.number);
+    const debit=entries.reduce((s,r)=>s+r.debit,0);
+    const credit=entries.reduce((s,r)=>s+r.credit,0);
+    const net=debit-credit;
+    const sd=Math.max(net,0);
+    const sc=Math.max(-net,0);
+    totalDebit+=debit;totalCredit+=credit;totalSD+=sd;totalSC+=sc;
+    return `<tr>
+      <td>${escapeHTML(a.number)}</td>
+      <td>${escapeHTML(a.name)}</td>
+      <td>${money(debit)}</td>
+      <td>${money(credit)}</td>
+      <td>${money(sd)}</td>
+      <td>${money(sc)}</td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("balanceRows").innerHTML=rows;
+  document.getElementById("balanceFoot").innerHTML=`
+    <tr>
+      <th colspan="2">Totaux</th>
+      <th>${money(totalDebit)}</th>
+      <th>${money(totalCredit)}</th>
+      <th>${money(totalSD)}</th>
+      <th>${money(totalSC)}</th>
+    </tr>`;
+  const balanced=Math.abs(totalDebit-totalCredit)<0.001;
+  document.getElementById("balanceStatus").innerHTML=balanced
+    ?'<span class="good">La balance est équilibrée.</span>'
+    :'<span class="bad">Attention : la balance présente un écart.</span>';
+}
+
+function renderAccounts(){
+  document.getElementById("accountRows").innerHTML=accounts.map(a=>`
+    <tr><td>${escapeHTML(a.number)}</td><td>${escapeHTML(a.name)}</td></tr>
+  `).join("");
+}
+
+function addAccount(){
+  const number=document.getElementById("newAccountNumber").value.trim();
+  const name=document.getElementById("newAccountName").value.trim();
+  if(!number || !name){
+    alert("أدخل رقم الحساب واسمه.");
+    return;
+  }
+  if(accounts.some(a=>a.number===number)){
+    alert("رقم الحساب موجود من قبل.");
+    return;
+  }
+  accounts.push({number,name});
+  accounts.sort((a,b)=>a.number.localeCompare(b.number));
+  saveData();
+  document.getElementById("newAccountNumber").value="";
+  document.getElementById("newAccountName").value="";
+  renderAll();
+  alert("تمت إضافة الحساب.");
+}
+
+function exportData(){
+  const data=JSON.stringify({accounts,operations},null,2);
+  const blob=new Blob([data],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="COMPTALIA-backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(){
+    try{
+      const data=JSON.parse(reader.result);
+      if(!Array.isArray(data.accounts)||!Array.isArray(data.operations))throw new Error();
+      accounts=data.accounts;
+      operations=data.operations;
+      saveData();
+      renderAll();
+      alert("تم استيراد البيانات بنجاح.");
+    }catch(e){
+      alert("ملف النسخة الاحتياطية غير صالح.");
+    }
+    event.target.value="";
+  };
+  reader.readAsText(file);
+}
+
+function renderAll(){
+  fillSelects();
+  renderDashboard();
+  renderJournal();
+  renderLedger();
+  renderBalance();
+  renderAccounts();
+}
+
+loadData();
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+renderAll();
+</script>
+</body>
+</html>
